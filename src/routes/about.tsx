@@ -30,17 +30,12 @@ function AboutPage() {
       <div className="mx-auto max-w-3xl px-6 py-12 md:px-10">
         <h1 className="text-3xl font-bold">About EmoSense</h1>
         <p className="mt-2 text-muted-foreground">
-          EmoSense is a real-time facial emotion recognition system. Face detection and
-          expression classification both run on-device with WebGL-accelerated tensors — no
-          server, no uploads.
+          EmoSense is a real-time facial emotion recognition system. Face detection and expression
+          classification both run on-device with WebGL-accelerated tensors.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <Item
-            icon={<Workflow className="size-4" />}
-            title="Pipeline"
-            body="Frame capture → face localisation → crop & normalise → CNN inference → top-1 emotion + confidence → overlay render."
-          />
+         
           <Item
             icon={<Cpu className="size-4" />}
             title="Model"

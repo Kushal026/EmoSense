@@ -46,8 +46,6 @@ function ImagePage() {
   const [error, setError] = useState<string | null>(null);
   const [faces, setFaces] = useState<FaceResult[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [processMs, setProcessMs] = useState(0);
-  const [inferMs, setInferMs] = useState(0);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [selected, setSelected] = useState(0);
   const [dragOver, setDragOver] = useState(false);
@@ -81,15 +79,11 @@ function ImagePage() {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(url);
 
-      const t1 = performance.now();
-      const result = await detectFaces(canvas, 512);
-      const t2 = performance.now();
+      const result = await detectFaces(canvas, 640);
 
       drawFaces(ctx, result);
       setFaces(result);
       setSelected(0);
-      setInferMs(t2 - t1);
-      setProcessMs(t2 - t0);
 
       if (result.length === 0) setError("No face detected.");
 
@@ -137,8 +131,6 @@ function ImagePage() {
       `File: ${fileName}`,
       `Generated: ${new Date().toLocaleString()}`,
       `Faces detected: ${faces.length}`,
-      `Processing time: ${processMs.toFixed(1)} ms`,
-      `Inference time: ${inferMs.toFixed(1)} ms`,
       "",
       ...faces.flatMap((f, i) => [
         `Face #${i + 1}`,
@@ -267,25 +259,59 @@ function ImagePage() {
               <h2 className="mb-3 text-sm font-semibold tracking-wide uppercase">Results</h2>
               <div className="mb-4 flex min-h-10 items-center">
                 {active ? (
-                  <EmotionBadge emotion={active.emotion} confidence={active.confidence} size="lg" />
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{EMOTION_META[active.emotion].emoji}</span>
+                    <EmotionBadge emotion={active.emotion} confidence={active.confidence} size="lg" />
+                  </div>
                 ) : (
                   <span className="text-sm text-muted-foreground">No results yet.</span>
                 )}
               </div>
+
+              {faces.length > 1 && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {faces.map((face, index) => (
+                    <span key={`${face.emotion}-${index}`} className="rounded-full border border-border/70 bg-surface/50 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                      Face {index + 1}: {face.emotion}
+                    </span>
+                  ))}
+                </div>
+              )}
               <StatRow label="Number of Faces" value={String(faces.length)} />
               <StatRow
                 label="Confidence"
                 value={active ? `${Math.round(active.confidence * 100)}%` : "—"}
                 accent
               />
-              <StatRow label="Processing Time" value={fileName ? `${processMs.toFixed(0)} ms` : "—"} />
-              <StatRow label="Inference Time" value={fileName ? `${inferMs.toFixed(0)} ms` : "—"} />
+
               <StatRow label="File" value={fileName ?? "—"} />
 
               <div className="mt-5 space-y-2 border-t border-border pt-4">
-                {EMOTION_KEYS.map((key) => (
-                  <ScoreBar key={key} emotion={key} value={active?.scores[key] ?? 0} />
-                ))}
+                <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
+                  Detected faces
+                </p>
+                {faces.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No faces detected.</p>
+                ) : (
+                  faces.map((face, index) => (
+                    <div key={`${face.emotion}-${index}`} className="rounded-xl border border-border/70 bg-surface/40 p-3">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          Face {index + 1}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm">{EMOTION_META[face.emotion].emoji}</span>
+                          <EmotionBadge emotion={face.emotion} confidence={face.confidence} size="sm" />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        {EMOTION_KEYS.map((key) => (
+                          <ScoreBar key={`${index}-${key}`} emotion={key} value={face.scores[key] ?? 0} />
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

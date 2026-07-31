@@ -24,7 +24,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div>
             <p className="font-display text-lg leading-none font-bold">EmoSense</p>
             <p className="mt-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-              Emotion AI
+              
             </p>
           </div>
         </div>
@@ -50,11 +50,7 @@ export function Shell({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        <div className="mt-auto rounded-xl border border-sidebar-border bg-surface-2/50 p-3">
-          <p className="text-xs text-muted-foreground">
-            Runs fully in your browser. No frames ever leave this device.
-          </p>
-        </div>
+       
       </aside>
 
       <main className="min-w-0 flex-1">

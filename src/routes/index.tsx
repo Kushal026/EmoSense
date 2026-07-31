@@ -43,9 +43,7 @@ function HomePage() {
   return (
     <Shell>
       <div className="mx-auto max-w-5xl px-6 py-14 md:px-10 md:py-20">
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted-foreground">
-          <Zap className="size-3.5 text-accent" /> On-device deep learning · 7 emotion classes
-        </p>
+        
 
         <h1 className="font-display text-6xl font-bold md:text-7xl">
           <span className="text-gradient">EmoSense</span>
@@ -71,20 +69,7 @@ function HomePage() {
           />
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-2">
-          {EMOTION_KEYS.map((key) => (
-            <span
-              key={key}
-              className="rounded-full border px-3 py-1 text-sm"
-              style={{
-                color: `var(${EMOTION_META[key].token})`,
-                borderColor: `color-mix(in oklch, var(${EMOTION_META[key].token}) 40%, transparent)`,
-              }}
-            >
-              {EMOTION_META[key].emoji} {EMOTION_META[key].label}
-            </span>
-          ))}
-        </div>
+        
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           <Feature icon={<Gauge className="size-4" />} title="25–30 FPS" body="Non-blocking detection loop keeps the UI smooth." />
@@ -92,26 +77,7 @@ function HomePage() {
           <Feature icon={<Zap className="size-4" />} title="Multi-face" body="Every visible face is boxed and classified." />
         </div>
 
-        <div className="mt-12 flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
-          {status === "loading" && (
-            <>
-              <span className="size-2 animate-pulse rounded-full bg-accent" />
-              <span className="text-muted-foreground">Loading emotion model…</span>
-            </>
-          )}
-          {status === "ready" && (
-            <>
-              <CheckCircle2 className="size-4 text-happy" />
-              <span className="text-foreground">Model Loaded Successfully</span>
-            </>
-          )}
-          {status === "error" && (
-            <>
-              <span className="size-2 rounded-full bg-destructive" />
-              <span className="text-destructive">Emotion model could not be loaded.</span>
-            </>
-          )}
-        </div>
+        
       </div>
     </Shell>
   );

@@ -12,6 +12,7 @@ export const EMOTION_KEYS = [
   "surprise",
   "neutral",
   "disgust",
+  "tired",
 ] as const;
 
 export type EmotionKey = (typeof EMOTION_KEYS)[number];
@@ -25,6 +26,7 @@ export const RAW_TO_KEY: Record<string, EmotionKey> = {
   surprised: "surprise",
   neutral: "neutral",
   disgusted: "disgust",
+  tired: "tired",
 };
 
 export const EMOTION_META: Record<
@@ -38,6 +40,7 @@ export const EMOTION_META: Record<
   surprise: { label: "Surprise", emoji: "😮", token: "--surprise" },
   neutral: { label: "Neutral", emoji: "😐", token: "--neutral" },
   disgust: { label: "Disgust", emoji: "🤢", token: "--disgust" },
+  tired: { label: "Tired", emoji: "😴", token: "--neutral" },
 };
 
 /** Resolve an emotion token to a concrete CSS color for canvas drawing. */

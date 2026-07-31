@@ -41,15 +41,20 @@ function LivePage() {
   const framesRef = useRef(0);
   const lastTickRef = useRef(performance.now());
   const fpsSamplesRef = useRef<number[]>([]);
+  const facesRef = useRef<FaceResult[]>([]);
+  const lastDetectAtRef = useRef(performance.now());
 
   const [camState, setCamState] = useState<CamState>("off");
   const [modelReady, setModelReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [faces, setFaces] = useState<FaceResult[]>([]);
   const [fps, setFps] = useState(0);
-  const [frames, setFrames] = useState(0);
-  const [detectMs, setDetectMs] = useState(0);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+
+  const updateFaces = useCallback((next: FaceResult[]) => {
+    facesRef.current = next;
+    setFaces(next);
+  }, []);
   const [deviceIndex, setDeviceIndex] = useState(0);
 
   const setState = (s: CamState) => {
@@ -84,13 +89,17 @@ function LivePage() {
     const canvas = canvasRef.current;
     if (!video || !canvas || stateRef.current !== "running") return;
 
-    if (!busyRef.current && video.readyState >= 2) {
+    const now = performance.now();
+    const targetCount = facesRef.current.length > 2 ? 15 : facesRef.current.length > 1 ? 18 : 24;
+    const intervalMs = 1000 / targetCount;
+    const shouldDetect = !busyRef.current && video.readyState >= 2 && now - lastDetectAtRef.current >= intervalMs;
+
+    if (shouldDetect) {
+      lastDetectAtRef.current = now;
       busyRef.current = true;
-      const t0 = performance.now();
       try {
-        const result = await detectFaces(video, 288);
-        setFaces(result);
-        setDetectMs(performance.now() - t0);
+        const result = await detectFaces(video, 320);
+        updateFaces(result);
 
         if (canvas.width !== video.videoWidth) {
           canvas.width = video.videoWidth;
@@ -103,9 +112,7 @@ function LivePage() {
         }
 
         framesRef.current += 1;
-        setFrames(framesRef.current);
 
-        const now = performance.now();
         const delta = now - lastTickRef.current;
         lastTickRef.current = now;
         const samples = fpsSamplesRef.current;
@@ -120,7 +127,7 @@ function LivePage() {
     }
 
     rafRef.current = requestAnimationFrame(() => void loop());
-  }, []);
+  }, [updateFaces]);
 
   const start = useCallback(
     async (index = deviceIndex) => {
@@ -147,6 +154,7 @@ function LivePage() {
         framesRef.current = 0;
         fpsSamplesRef.current = [];
         lastTickRef.current = performance.now();
+        lastDetectAtRef.current = performance.now();
         setState("running");
         rafRef.current = requestAnimationFrame(() => void loop());
       } catch (err) {
@@ -165,6 +173,7 @@ function LivePage() {
   const pause = () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = null;
+    updateFaces([]);
     setState("paused");
   };
 
@@ -177,7 +186,7 @@ function LivePage() {
   const stop = () => {
     stopStream();
     setState("off");
-    setFaces([]);
+    updateFaces([]);
     setFps(0);
   };
 
@@ -274,7 +283,10 @@ function LivePage() {
 
             <div className="mb-4 flex min-h-10 items-center">
               {top ? (
-                <EmotionBadge emotion={top.emotion} confidence={top.confidence} size="lg" />
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{EMOTION_META[top.emotion].emoji}</span>
+                  <EmotionBadge emotion={top.emotion} confidence={top.confidence} size="lg" />
+                </div>
               ) : (
                 <span className="text-sm text-muted-foreground">
                   {running ? "No face detected." : "Awaiting camera…"}
@@ -282,17 +294,17 @@ function LivePage() {
               )}
             </div>
 
-            <StatRow
-              label="Current Emotion"
-              value={top ? EMOTION_META[top.emotion].label : "—"}
-            />
-            <StatRow
-              label="Confidence"
-              value={top ? `${Math.round(top.confidence * 100)}%` : "—"}
-              accent
-            />
+              {faces.length > 1 && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {faces.map((face, index) => (
+                    <span key={`${face.emotion}-${index}`} className="rounded-full border border-border/70 bg-surface/50 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                      Face {index + 1}: {EMOTION_META[face.emotion].label}
+                    </span>
+                  ))}
+                </div>
+              )}
+
             <StatRow label="Faces" value={String(faces.length)} />
-            <StatRow label="Frames Processed" value={String(frames)} />
             <StatRow label="Current FPS" value={fps.toFixed(1)} accent />
             <StatRow
               label="Camera Status"
@@ -306,16 +318,34 @@ function LivePage() {
                       : "Stopped"
               }
             />
-            <StatRow label="Detection Time" value={`${detectMs.toFixed(0)} ms`} />
             <StatRow label="Model" value={modelReady ? "Loaded" : "Loading…"} />
 
             <div className="mt-5 space-y-2 border-t border-border pt-4">
               <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
-                Class probabilities
+                Detected faces
               </p>
-              {EMOTION_KEYS.map((key: EmotionKey) => (
-                <ScoreBar key={key} emotion={key} value={top?.scores[key] ?? 0} />
-              ))}
+              {faces.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No face detected yet.</p>
+              ) : (
+                faces.map((face, index) => (
+                  <div key={`${face.emotion}-${index}`} className="rounded-xl border border-border/70 bg-surface/40 p-3">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Face {index + 1}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">{EMOTION_META[face.emotion].emoji}</span>
+                        <EmotionBadge emotion={face.emotion} confidence={face.confidence} size="sm" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      {EMOTION_KEYS.map((key) => (
+                        <ScoreBar key={`${index}-${key}`} emotion={key} value={face.scores[key] ?? 0} />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </aside>
         </div>
