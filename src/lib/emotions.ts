@@ -1,5 +1,5 @@
 /**
- * Emotion metadata shared by the live and image detection screens.
+ * Emotion metadata for emotion detection screens.
  * face-api returns FER-style labels; we map them to display names,
  * emoji and design-system color tokens.
  */

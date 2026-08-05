@@ -81,12 +81,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Detect emotions from facial expressions in real time using your webcam or an uploaded image.",
+          "Detect emotions from facial expressions in real time using your webcam.",
       },
       { property: "og:title", content: "EmoSense — Real-Time AI Emotion Detection" },
       {
         property: "og:description",
-        content: "Live webcam and image emotion recognition running fully on-device.",
+        content: "Live webcam emotion recognition running fully on-device.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

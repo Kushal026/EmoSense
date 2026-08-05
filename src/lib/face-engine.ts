@@ -177,9 +177,9 @@ export function isReady() {
   return faceapi !== null;
 }
 
-/** Run detection + expression prediction on a video or image element. */
+/** Run detection + expression prediction on a video or canvas element. */
 export async function detectFaces(
-  input: HTMLVideoElement | HTMLImageElement | HTMLCanvasElement,
+  input: HTMLVideoElement | HTMLCanvasElement,
   inputSize = 320,
 ): Promise<FaceResult[]> {
   const api = faceapi ?? (await loadEngine());
@@ -189,11 +189,11 @@ export async function detectFaces(
   });
 
   const detections = await api
-    .detectAllFaces(input as HTMLVideoElement, options)
+    .detectAllFaces(input, options)
     .withFaceExpressions();
 
-  const width = input.width || input.videoWidth || input.naturalWidth || 0;
-  const height = input.height || input.videoHeight || input.naturalHeight || 0;
+  const width = input.width || ("videoWidth" in input ? input.videoWidth : 0);
+  const height = input.height || ("videoHeight" in input ? input.videoHeight : 0);
 
   const validDetections = detections
     .map((d) => ({ d, box: d.detection.box }))

@@ -1,9 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Camera, ImageIcon, Zap, ShieldCheck, Gauge, CheckCircle2 } from "lucide-react";
+import { Camera, Zap, ShieldCheck, Gauge } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Shell } from "@/components/Shell";
 import { loadEngine } from "@/lib/face-engine";
-import { EMOTION_KEYS, EMOTION_META } from "@/lib/emotions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -12,13 +11,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "EmoSense detects human emotions from facial expressions in real time using your webcam or an uploaded image. Runs entirely in your browser.",
+          "EmoSense detects human emotions from facial expressions in real time using your webcam. Runs entirely in your browser.",
       },
       { property: "og:title", content: "EmoSense — Real-Time AI Emotion Detection" },
       {
         property: "og:description",
         content:
-          "Live webcam and image emotion recognition with a 7-class expression CNN, running fully on-device.",
+          "Live webcam emotion recognition with a 7-class expression CNN, running fully on-device.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -43,16 +42,14 @@ function HomePage() {
   return (
     <Shell>
       <div className="mx-auto max-w-5xl px-6 py-14 md:px-10 md:py-20">
-        
-
         <h1 className="font-display text-6xl font-bold md:text-7xl">
           <span className="text-gradient">EmoSense</span>
         </h1>
         <p className="mt-3 max-w-xl text-lg text-muted-foreground">
-          AI Powered Emotion Detection System
+          AI Powered Live Emotion Detection System
         </p>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
+        <div className="mt-12 max-w-xl">
           <ModeCard
             icon={<Camera className="size-6" />}
             title="Live Emotion Detection"
@@ -60,24 +57,13 @@ function HomePage() {
             cta="Start Camera"
             to="/live"
           />
-          <ModeCard
-            icon={<ImageIcon className="size-6" />}
-            title="Image Emotion Detection"
-            body="Upload a JPG or PNG, detect all faces at once, review per-face confidence and export the annotated result."
-            cta="Upload Image"
-            to="/image"
-          />
         </div>
-
-        
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           <Feature icon={<Gauge className="size-4" />} title="25–30 FPS" body="Non-blocking detection loop keeps the UI smooth." />
           <Feature icon={<ShieldCheck className="size-4" />} title="Private" body="Frames are processed locally, never uploaded." />
           <Feature icon={<Zap className="size-4" />} title="Multi-face" body="Every visible face is boxed and classified." />
         </div>
-
-        
       </div>
     </Shell>
   );

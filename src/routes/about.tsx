@@ -49,7 +49,7 @@ function AboutPage() {
           <Item
             icon={<ShieldCheck className="size-4" />}
             title="Privacy"
-            body="Webcam frames and uploaded images are processed locally and are never transmitted or stored anywhere."
+            body="Webcam frames are processed locally and are never transmitted or stored anywhere."
           />
         </div>
 

@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as ImageRouteImport } from './routes/image'
 import { Route as LiveRouteImport } from './routes/live'
 
 const IndexRoute = IndexRouteImport.update({
@@ -24,11 +23,6 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ImageRoute = ImageRouteImport.update({
-  id: '/image',
-  path: '/image',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LiveRoute = LiveRouteImport.update({
   id: '/live',
   path: '/live',
@@ -38,34 +32,30 @@ const LiveRoute = LiveRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/image': typeof ImageRoute
   '/live': typeof LiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/image': typeof ImageRoute
   '/live': typeof LiveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/image': typeof ImageRoute
   '/live': typeof LiveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/image' | '/live'
+  fullPaths: '/' | '/about' | '/live'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/image' | '/live'
-  id: '__root__' | '/' | '/about' | '/image' | '/live'
+  to: '/' | '/about' | '/live'
+  id: '__root__' | '/' | '/about' | '/live'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  ImageRoute: typeof ImageRoute
   LiveRoute: typeof LiveRoute
 }
 
@@ -85,13 +75,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/image': {
-      id: '/image'
-      path: '/image'
-      fullPath: '/image'
-      preLoaderRoute: typeof ImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/live': {
       id: '/live'
       path: '/live'
@@ -105,7 +88,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  ImageRoute: ImageRoute,
   LiveRoute: LiveRoute,
 }
 export const routeTree = rootRouteImport

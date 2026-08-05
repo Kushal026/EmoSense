@@ -1,12 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Camera, Home, ImageIcon, Info, ScanFace } from "lucide-react";
+import { Camera, Home, Info, ScanFace } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
   { to: "/live", label: "Live Detection", icon: Camera },
-  { to: "/image", label: "Image Detection", icon: ImageIcon },
   { to: "/about", label: "About", icon: Info },
 ] as const;
 
